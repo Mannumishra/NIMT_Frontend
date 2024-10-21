@@ -1,0 +1,22 @@
+.nimtExperienced{
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.nimtExperienced i{
+    font-size: 25px;
+    height: 50px;
+    width: 50px;
+    display: inline-block;
+    border-radius: 50%;
+    background-color: var(--color-heading);
+    color: white;
+}
+
+@media only screen and (max-width:768px) {
+    .welcome_Nimt{
+        margin-top: 0rem;
+    }
+    
+}
