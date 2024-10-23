@@ -11,7 +11,7 @@ const WebDesigning = () => {
 
   const getApiData = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/get-single-course-details/" + id);
+      const res = await axios.get("https://ins.api.digiindiasolutions.com/api/get-single-course-details/" + id);
       console.log(res)
       setData(res.data.data); // Set API response data
     } catch (error) {
