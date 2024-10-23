@@ -15,7 +15,7 @@ const ComputerCourse = () => {
 
   const getapiData = async () => {
     try {
-      const res = await axios.get("https://ins.api.digiindiasolutions.com/api/get-all-course");
+      const res = await axios.get("http://localhost:8000/api/get-all-course");
       if (res.status === 200) {
         setCourses(res.data.data);
       }
