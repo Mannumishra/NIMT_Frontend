@@ -70,7 +70,7 @@ const OurCourses = () => {
                       <p>
                         <b>Course Duration</b>
                         <br />
-                        {course.courseDuration} weeks
+                        {course.courseDuration} Months
                       </p>
                     </div>
                     <div>
