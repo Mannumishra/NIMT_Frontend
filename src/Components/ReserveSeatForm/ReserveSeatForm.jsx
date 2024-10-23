@@ -1,6 +1,78 @@
-import React from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 
 const ReserveSeatForm = () => {
+  const [courseData ,setCourseData] = useState([])
+  const getApiData = async()=>{
+    try {
+      const res = await axios.get("http://localhost:8000/api/get-all-course")
+      if(res.status===200){
+        setCourseData(res.data.data)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(()=>{
+    getApiData()
+  },[])
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    course: "",
+    branch: "",
+    message: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(null); // null = no status, true = success, false = error
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    // Validate the form before submission
+    if (!formData.name || !formData.email || !formData.phone || !formData.course || !formData.branch) {
+      alert("Please fill out all required fields.");
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await axios.post("http://localhost:8000/api/send-query", formData)
+      setLoading(false);
+      if (res.status === 200) {
+        setSuccess(true);
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          course: "",
+          branch: "",
+          message: "",
+        });
+      } else {
+        setSuccess(false);
+      }
+    } catch (error) {
+      setLoading(false);
+      setSuccess(false);
+      console.error("Error submitting form:", error);
+    }
+    finally {
+      // Reset success state after 2 seconds
+      setTimeout(() => {
+        setSuccess(null);
+      }, 2000);
+    }
+  };
+
   return (
     <>
       <section className="reserve mt-3">
@@ -9,111 +81,98 @@ const ReserveSeatForm = () => {
             <h2>RESERVE YOUR SEAT</h2>
             <p>Fill In The Form Below To Reserve Your Seat Asap!</p>
           </div>
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="row">
-              <div className="col-md-6 mb-3">
-                <label htmlFor="name">First Name</label>
+              <div className="col-md-4 mb-3">
+                <label htmlFor="name">Full Name</label>
                 <input
                   type="text"
                   className="form-control"
                   name="name"
                   id="name"
+                  value={formData.name}
+                  onChange={handleChange}
                   required
                 />
               </div>
-              <div className="col-md-6 mb-3">
-                <label htmlFor="lastName">Last Name</label>
+              <div className="col-md-4 mb-3">
+                <label htmlFor="email">Email</label>
                 <input
-                  type="text"
+                  type="email"
                   className="form-control"
-                  name="lastName"
-                  id="lastName"
+                  name="email"
+                  id="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   required
                 />
               </div>
-              <div className="col-md-6 mb-3">
-                <label htmlFor="website">Website</label>
+              <div className="col-md-4 mb-3">
+                <label htmlFor="phone">Phone Number</label>
                 <input
-                  type="text"
+                  type="phone"
                   className="form-control"
-                  name="website"
-                  id="website"
-                />
-              </div>
-              <div className="col-md-6 mb-3">
-                <label htmlFor="reason">Reason for Inquiry</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  name="reason"
-                  id="reason"
+                  name="phone"
+                  id="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  required
                 />
               </div>
               <div className="col-md-6 mb-3">
                 <label htmlFor="ChooseCourse">Choose Course</label>
                 <select
-                  name="ChooseCourse"
+                  name="course"
                   id="ChooseCourse"
                   className="form-select"
+                  value={formData.course}
+                  onChange={handleChange}
                   required
                 >
-                  <option value="">Select a Course</option>
-                  <option value="computer">Computer</option>
-                  <option value="iti">ITI</option>
-                  <option value="webDesigning">Web Designing</option>
-                  <option value="webDevelopment">Web Development</option>
+                  <option value="" selected disabled>Select Course</option>
+                  {
+                  courseData.map((item,index)=>
+                  <option value={item.courseName}>{item.courseName}</option>
+                  )
+                 }
                 </select>
               </div>
               <div className="col-md-6 mb-3">
-                <label htmlFor="ChooseCourse">Choose Teacher</label>
+                <label htmlFor="ChooseBranch">Choose Branch</label>
                 <select
-                  name="ChooseCourse"
-                  id="ChooseCourse"
+                  name="branch"
+                  id="ChooseBranch"
                   className="form-select"
+                  value={formData.branch}
+                  onChange={handleChange}
                   required
                 >
-                  <option value="">Select a Course</option>
-                  <option value="computer">Computer</option>
-                  <option value="iti">ITI</option>
-                  <option value="webDesigning">Web Designing</option>
-                  <option value="webDevelopment">Web Development</option>
+                  <option value="" selected disabled>Select Branch</option>
+                  <option value="315, Daroga Market, Burari Chowk, 1st floor, Burari Delhi-84">315, Daroga Market, Burari Chowk, 1st floor, Burari Delhi-84</option>
+                  <option value="Main Bus Stand, Nathupura , Burari Delhi -84">Main Bus Stand, Nathupura , Burari Delhi -84</option>
                 </select>
               </div>
               <div className="col-md-12 mb-3">
                 <textarea
                   className="form-control"
                   name="message"
-                  id=""
                   placeholder="Your Message..."
+                  rows={5}
+                  value={formData.message}
+                  onChange={handleChange}
                 ></textarea>
               </div>
               <div className="col-md-12 mb-3 text-center">
-                <button type="submit" className="button">
-                  Submit
+                <button type="submit" className="button" disabled={loading}>
+                  {loading ? "Submitting..." : "Submit"}
                 </button>
               </div>
             </div>
           </form>
-        </div>
-        <div className="anyQuestion p-3 bg-light mt-4">
-          <div className="container">
-            <div className="row align-items-center">
-              <div className="col-md-10">
-                <h5>
-                  <span>
-                    <i class="bi bi-tablet"></i>
-                  </span>{" "}
-                  &nbsp; If you Have Any Questions Call Us On &nbsp;
-                  <a style={{ color: `var(--color-heading)` }} href="tel:+91">
-                    <b>(010)123-456-7890</b>
-                  </a>
-                </h5>
-              </div>
-              <div className="col-md-2">
-                <button className="button">Appointment</button>
-              </div>
-            </div>
-          </div>
+
+          {/* Show success/error message */}
+          {success === true && <h2 className="text-success text-center">Seat reserved successfully!</h2>}
+          {success === false && <h2 className="text-danger text-center">Something went wrong. Please try again.</h2>}
         </div>
       </section>
     </>

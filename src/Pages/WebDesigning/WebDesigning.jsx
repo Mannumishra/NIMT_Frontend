@@ -25,7 +25,7 @@ const WebDesigning = () => {
 
   return (
     <>
-    {Object.keys(data).length > 0 && (
+    {Object.keys(data).length > 0 ? (
       <>
       <div className="breadcrump">
         <div className="breadcrumbOverlay">
@@ -68,14 +68,14 @@ const WebDesigning = () => {
             </div>
           </div>
           <div className="col-md-3">
-            <div className="webdesignSideSection">
+            {/* <div className="webdesignSideSection">
               <img src={teacher} className="w-100" alt="Teacher" />
               <h3>Miss Maria</h3>
               <p>
                 <b>Monthly Price:$28.55</b>
               </p>
               <button className="registerbtn">REGISTER YOURSELF</button>
-            </div>
+            </div> */}
             <div className="webdesignSideSection">
               <h2>Audience</h2>
               <hr />
@@ -102,10 +102,11 @@ const WebDesigning = () => {
         <ReserveSeatForm />
       </div>
       </>
-        )} 
+        ):
         <div>
          <h1 className="text-center mt-5 mb-5"> "Looks Like We Have No Courses Right Now" </h1>
         </div>
+        }
     </>
   );
 };
