@@ -6,7 +6,7 @@ const Hero = () => {
   const [courseData, setCourseData] = useState([])
   const getApiData = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/get-all-course")
+      const res = await axios.get("https://ins.api.digiindiasolutions.com/api/get-all-course")
       if (res.status === 200) {
         setCourseData(res.data.data)
       }
@@ -46,7 +46,7 @@ const Hero = () => {
     }
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:8000/api/send-query", formData)
+      const res = await axios.post("https://ins.api.digiindiasolutions.com/api/send-query", formData)
       setLoading(false);
       if (res.status === 200) {
         setSuccess(true);
