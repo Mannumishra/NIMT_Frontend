@@ -3,21 +3,9 @@ import "./hero.css";
 import axios from "axios";
 
 const Hero = () => {
-  const [courseData, setCourseData] = useState([])
-  const getApiData = async () => {
-    try {
-      const res = await axios.get("https://ins.api.digiindiasolutions.com/api/get-all-course")
-      if (res.status === 200) {
-        setCourseData(res.data.data)
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  useEffect(() => {
-    getApiData()
-  }, [])
+  const [courseData, setCourseData] = useState([]);
+  const [filteredCourses, setFilteredCourses] = useState([]);
+  const [courseCategory, setCourseCategory] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -26,27 +14,67 @@ const Hero = () => {
     branch: "",
     message: "",
   });
-
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(null); // null = no status, true = success, false = error
+  const [success, setSuccess] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const getApiData = async () => {
+    try {
+      const res = await axios.get("https://ins.api.digiindiasolutions.com/api/get-all-course");
+      if (res.status === 200) {
+        setCourseData(res.data.data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getApiCategory = async () => {
+    try {
+      const res = await axios.get("https://ins.api.digiindiasolutions.com/api/get-course-category");
+      if (res.status === 200) {
+        setCourseCategory(res.data.data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    getApiData();
+    getApiCategory();
+  }, []);
+
+  useEffect(() => {
+    if (formData.branch) {
+      const relatedCourses = courseData.filter(
+        (x) => x.courseCtegory.courseCategoryName === formData.branch
+      );
+      setFilteredCourses(relatedCourses);
+    } else {
+      setFilteredCourses([]);
+    }
+  }, [formData.branch, courseData]);
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
+    setErrorMessage(""); // Reset error message on change
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Validate the form before submission
     if (!formData.name || !formData.email || !formData.phone || !formData.course || !formData.branch) {
-      alert("Please fill out all required fields.");
+      setErrorMessage("Please fill out all required fields.");
       return;
     }
+
     setLoading(true);
     try {
-      const res = await axios.post("https://ins.api.digiindiasolutions.com/api/send-query", formData)
+      const res = await axios.post("https://ins.api.digiindiasolutions.com/api/send-query", formData);
       setLoading(false);
       if (res.status === 200) {
         setSuccess(true);
@@ -66,7 +94,6 @@ const Hero = () => {
       setSuccess(false);
       console.error("Error submitting form:", error);
     } finally {
-      // Reset success state after 2 seconds
       setTimeout(() => {
         setSuccess(null);
       }, 2000);
@@ -125,22 +152,30 @@ const Hero = () => {
                 />
               </div>
               <div className="enquiry_form">
-                <select className="form-control" name="course" id="" onChange={handleChange} value={formData.course}>
-                  <option value="" selected disabled>Select Course</option>
+                <select className="form-control" name="branch" id="" onChange={handleChange} value={formData.branch}>
+                  <option value="" selected disabled>Select Course Category</option>
                   {
-                    courseData.map((item, index) =>
-                      <option value={item.courseName}>{item.courseName}</option>
+                    courseCategory.map((item, index) =>
+                      <option value={item.courseCategoryName}>{item.courseCategoryName}</option>
                     )
                   }
                 </select>
               </div>
               <div className="enquiry_form">
-                <select className="form-control" name="branch" id="" onChange={handleChange} value={formData.branch}>
-                  <option value="" selected disabled>Select Branch</option>
-                  <option value="315, Daroga Market, Burari Chowk, 1st floor, Burari Delhi-84">315, Daroga Market, Burari Chowk, 1st floor, Burari Delhi-84</option>
-                  <option value="Main Bus Stand, Nathupura , Burari Delhi -84">Main Bus Stand, Nathupura , Burari Delhi -84</option>
+                <select className="form-control" name="course" id="" onChange={handleChange} value={formData.course}>
+                  <option value="" selected disabled>Select Course</option>
+                  {
+                    filteredCourses.length > 0 ? (
+                      filteredCourses.map((item, index) =>
+                        <option value={item.courseName}>{item.courseName}</option>
+                      )
+                    ) : (
+                      <option value="NO Course Available">---NO Course Available---</option>
+                    )
+                  }
                 </select>
               </div>
+
               <div className="enquiry_form">
                 <textarea name="message" onChange={handleChange} value={formData.message} id="" className="form-control" placeholder="Message..."></textarea>
               </div>
@@ -149,7 +184,7 @@ const Hero = () => {
               </div>
             </form>
             {/* Show success/error message */}
-            {success === true && <h2 className="text-success text-center">Seat reserved successfully!</h2>}
+            {success === true && <h2 className="text-success text-center">Inquiry Send successfully!</h2>}
             {success === false && <h2 className="text-danger text-center">Something went wrong. Please try again.</h2>}
           </div>
 

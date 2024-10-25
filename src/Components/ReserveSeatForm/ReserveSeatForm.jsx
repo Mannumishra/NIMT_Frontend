@@ -2,21 +2,9 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 
 const ReserveSeatForm = () => {
-  const [courseData ,setCourseData] = useState([])
-  const getApiData = async()=>{
-    try {
-      const res = await axios.get("https://ins.api.digiindiasolutions.com/api/get-all-course")
-      if(res.status===200){
-        setCourseData(res.data.data)
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  useEffect(()=>{
-    getApiData()
-  },[])
+  const [courseData, setCourseData] = useState([]);
+  const [filteredCourses, setFilteredCourses] = useState([]);
+  const [courseCategory, setCourseCategory] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -25,27 +13,67 @@ const ReserveSeatForm = () => {
     branch: "",
     message: "",
   });
-
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(null); // null = no status, true = success, false = error
+  const [success, setSuccess] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const getApiData = async () => {
+    try {
+      const res = await axios.get("https://ins.api.digiindiasolutions.com/api/get-all-course");
+      if (res.status === 200) {
+        setCourseData(res.data.data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getApiCategory = async () => {
+    try {
+      const res = await axios.get("https://ins.api.digiindiasolutions.com/api/get-course-category");
+      if (res.status === 200) {
+        setCourseCategory(res.data.data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    getApiData();
+    getApiCategory();
+  }, []);
+
+  useEffect(() => {
+    if (formData.branch) {
+      const relatedCourses = courseData.filter(
+        (x) => x.courseCtegory.courseCategoryName === formData.branch
+      );
+      setFilteredCourses(relatedCourses);
+    } else {
+      setFilteredCourses([]);
+    }
+  }, [formData.branch, courseData]);
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
+    setErrorMessage(""); // Reset error message on change
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Validate the form before submission
     if (!formData.name || !formData.email || !formData.phone || !formData.course || !formData.branch) {
-      alert("Please fill out all required fields.");
+      setErrorMessage("Please fill out all required fields.");
       return;
     }
+
     setLoading(true);
     try {
-      const res = await axios.post("https://ins.api.digiindiasolutions.com/api/send-query", formData)
+      const res = await axios.post("https://ins.api.digiindiasolutions.com/api/send-query", formData);
       setLoading(false);
       if (res.status === 200) {
         setSuccess(true);
@@ -64,9 +92,7 @@ const ReserveSeatForm = () => {
       setLoading(false);
       setSuccess(false);
       console.error("Error submitting form:", error);
-    }
-    finally {
-      // Reset success state after 2 seconds
+    } finally {
       setTimeout(() => {
         setSuccess(null);
       }, 2000);
@@ -119,37 +145,28 @@ const ReserveSeatForm = () => {
                   required
                 />
               </div>
-              <div className="col-md-6 mb-3">
-                <label htmlFor="ChooseCourse">Choose Course</label>
-                <select
-                  name="course"
-                  id="ChooseCourse"
-                  className="form-select"
-                  value={formData.course}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="" selected disabled>Select Course</option>
+              <div className="enquiry_form">
+                <select className="form-control" name="branch" id="" onChange={handleChange} value={formData.branch}>
+                  <option value="" selected disabled>Select Course Category</option>
                   {
-                  courseData.map((item,index)=>
-                  <option value={item.courseName}>{item.courseName}</option>
-                  )
-                 }
+                    courseCategory.map((item, index) =>
+                      <option value={item.courseCategoryName}>{item.courseCategoryName}</option>
+                    )
+                  }
                 </select>
               </div>
-              <div className="col-md-6 mb-3">
-                <label htmlFor="ChooseBranch">Choose Branch</label>
-                <select
-                  name="branch"
-                  id="ChooseBranch"
-                  className="form-select"
-                  value={formData.branch}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="" selected disabled>Select Branch</option>
-                  <option value="315, Daroga Market, Burari Chowk, 1st floor, Burari Delhi-84">315, Daroga Market, Burari Chowk, 1st floor, Burari Delhi-84</option>
-                  <option value="Main Bus Stand, Nathupura , Burari Delhi -84">Main Bus Stand, Nathupura , Burari Delhi -84</option>
+              <div className="enquiry_form">
+                <select className="form-control" name="course" id="" onChange={handleChange} value={formData.course}>
+                  <option value="" selected disabled>Select Course</option>
+                 {
+                  filteredCourses.length>0? (
+                    filteredCourses.map((item, index) =>
+                      <option value={item.courseName}>{item.courseName}</option>
+                    )
+                  ):(
+                  <option value="NO Course Available">---NO Course Available---</option>
+                )
+                 }
                 </select>
               </div>
               <div className="col-md-12 mb-3">
@@ -171,7 +188,7 @@ const ReserveSeatForm = () => {
           </form>
 
           {/* Show success/error message */}
-          {success === true && <h2 className="text-success text-center">Seat reserved successfully!</h2>}
+          {success === true && <h2 className="text-success text-center">Inquiry Send successfully!</h2>}
           {success === false && <h2 className="text-danger text-center">Something went wrong. Please try again.</h2>}
         </div>
       </section>

@@ -23,6 +23,13 @@ const WebDesigning = () => {
     getApiData();
   }, [id]);
 
+  useEffect(()=>{
+    window.scrollTo({
+      top:0,
+      behavior:"smooth"
+    })
+  },[])
+
   return (
     <>
     {Object.keys(data).length > 0 ? (
@@ -90,7 +97,7 @@ const WebDesigning = () => {
               <h2>Duration & Frequency</h2>
               <hr />
               <p>
-                <i className="bi bi-chevron-double-right"></i> {data?.courseName?.courseDuration} weak
+                <i className="bi bi-chevron-double-right"></i> {data?.courseName?.courseDuration} Months
               </p>
               <p>
                 <i className="bi bi-chevron-double-right"></i> 3 sessions of 2 hours

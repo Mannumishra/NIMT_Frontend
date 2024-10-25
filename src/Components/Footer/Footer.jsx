@@ -9,6 +9,7 @@ import insta6 from "../../Images/footer6.png";
 import insta7 from "../../Images/footer7.png";
 import insta8 from "../../Images/footer8.png";
 import insta9 from "../../Images/footer9.png";
+import { Link } from 'react-router-dom'
 const Footer = () => {
   const images = [
     { src: insta1 },
@@ -39,12 +40,12 @@ const Footer = () => {
                 <b>Email</b>
               </h5>
               <p>
-                <a className="text-white text-decoration-none" href="">
-                  support@education.com
+                <a className="text-white text-decoration-none" href="mailto:support@nimteducation.com">
+                  support@nimteducation.com
                 </a>
                 <br />
-                <a className="text-white text-decoration-none" href="">
-                  info@education.com
+                <a className="text-white text-decoration-none" href="mailto:info@nimteducation.com">
+                  info@nimteducation.com
                 </a>
               </p>
             </div>
@@ -53,18 +54,18 @@ const Footer = () => {
                 <b>Phone</b>
               </h5>
               <p>
-                <a className="text-white text-decoration-none" href="tel:+91">+44 44859 4875</a>
+                <a className="text-white text-decoration-none" href="tel:+919899520627">+91 98995 20627</a>
                 <br />
-                <a className="text-white text-decoration-none" href="tel:+91">+44 44859 4875</a>
+                <a className="text-white text-decoration-none" href="tel:+919871655701">+91 98716 55701</a>
               </p>
             </div>
             <div className="col-md-4">
               <h5>
-                <b>Approval</b>
+                <b>Important Link</b>
               </h5>
-             <p className="m-0">UGC ENTITLED</p>
-             <p className="m-0">AICTE APPROVED</p>
-             <p className="m-0">MEMBER OF DISTANCE EDUCATION COUNCIL</p>
+              <a className="m-0" href="https://www.ugc.gov.in/" target="_blank" style={{ textDecoration: "none", color: "white" }}>UGC ENTITLED</a><br />
+              <a className="m-0" href='https://deb.ugc.ac.in/' target="_blank" style={{ textDecoration: "none", color: "white" }}>AICTE APPROVED</a> <br />
+              <a className="m-0" href='https://www.aicte-india.org/' target="_blank" style={{ textDecoration: "none", color: "white" }}>MEMBER OF DISTANCE EDUCATION COUNCIL</a>
             </div>
           </div>
         </div>
